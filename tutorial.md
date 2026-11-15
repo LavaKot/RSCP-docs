@@ -349,7 +349,8 @@ math habit:
   catch it, so the compiler is the only line of defense: double-check every
   `^` you write.
 * `int / int` is **integer division** like in Rust: `5 / 2` is `2`. For the
-  float result write `5.0 / 2` or `float(a) / b`. There is no implicit
+  float result write `5.0 / 2` or `float(a) / b`; `a // b` (26.0.12.5) is
+  explicit floor division, `-7 // 2` is `-4`. There is no implicit
   promotion.
 
 ```rust

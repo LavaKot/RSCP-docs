@@ -55,7 +55,7 @@ equality       := comparison { ( "==" | "!=" ) comparison } ;
 comparison     := shift { ( "<" | "<=" | ">" | ">=" | "instanceof" ) shift } ;
 shift          := term { ( "<<" | ">>" ) term } ;
 term           := factor { ( "+" | "-" ) factor } ;
-factor         := unary { ( "*" | "/" | "%" ) unary } ;
+factor         := unary { ( "*" | "/" | "//" | "%" ) unary } ;
 unary          := ( "!" | "not" | "-" | "~" ) unary | power ;
 power          := postfix [ "**" unary ] ;   (* right-assoc, tighter than unary *)
 postfix        := primary { "(" [ arguments ] ")" | "[" expression "]" | "." IDENT }
