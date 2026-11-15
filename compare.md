@@ -20,7 +20,7 @@ program.
 | bitwise | `\| & ^ << >>` | `\| & ^ ! << >>` | `\| & ^ ~ << >>` (Rust precedence) |
 | types | dynamic | static, inferred | dynamic |
 | memory | GC | ownership | refcounted `Rc` values |
-| speed | interpreter | native code | bytecode VM (≈ C-style loop ≈ 180 ns/iteration) |
+| speed | interpreter | native code | bytecode VM (a pure counted loop runs ~18 ns/iteration) |
 
 ## When to pick RSCP
 
