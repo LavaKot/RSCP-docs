@@ -15,10 +15,10 @@ program.
 | loops | `for i in range(n)` | `for i in 0..n` | `for i in 0..n` |
 | infinite loop | `while True:` | `loop { }` | `loop { }` |
 | slices | `a[1:3]`, `a[::-1]` | `&a[1..3]` | `a[1:3]`, `a[::-1]` |
-| branching | `match` (3.10+) | `match` | `match` (expression, with guards and ranges) |
+| branching | `match` (3.10+) | `match` | `match` (expression, guards, ranges, enum destructuring with compile-time exhaustiveness) |
 | classes | `class A:` | `struct` + `impl` | `class A(Parent) { fn ... }` |
 | bitwise | `\| & ^ << >>` | `\| & ^ ! << >>` | `\| & ^ ~ << >>` (Rust precedence) |
-| types | dynamic | static, inferred | dynamic |
+| types | dynamic | static, inferred | dynamic (+ enum sum types with exhaustiveness) |
 | memory | GC | ownership | refcounted `Rc` values |
 | speed | interpreter | native code | bytecode VM (a pure counted loop runs ~18 ns/iteration) |
 

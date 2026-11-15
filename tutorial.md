@@ -274,6 +274,43 @@ hood a class is an immutable map (`{"__name__": ..., "__isclass__": true,
 `__class__` reference — so `keys()`, `has()` and map iteration work on
 them, and classes compose with everything else in the language.
 
+## Enums (sum types)
+
+`enum Name { ... }` declares a sum type: unit variants are values, tuple
+variants are constructor functions (26.0.11.0):
+
+```rust
+enum Shape {
+    Circle,
+    Rect(w, h),
+    Point
+}
+
+println(Shape.Circle, Shape.Rect(3, 4))    # Shape.Circle Shape.Rect(3, 4)
+println(type(Shape.Circle))                # Shape
+println(Shape.Rect(3, 4) == Shape.Rect(3, 4))   # true — structural equality
+println(Shape.Circle instanceof Shape)     # true
+```
+
+`match` destructures variants, and the compiler **checks exhaustiveness**:
+cover every variant (alternation counts) or add a catch-all, otherwise the
+match does not compile:
+
+```rust
+fn area(s) -> match s {
+    Shape.Circle => 3.14159
+    Shape.Rect(w, h) => w * h     # payload bindings
+    Shape.Point => 0
+}
+# match on enum 'Shape' is not exhaustive: missing variant(s): Point
+```
+
+Guards work over the destructured payload (`Shape.Rect(w, h) if w == h => …`),
+and a non-enum subject simply takes the `else`/`_` arm. Notes: variants are
+maps under the hood (`keys()` shows the markers), equality is structural
+(same variant, equal payload), and patterns only see enums declared in the
+same file — imports resolve at runtime.
+
 ## Errors: `try` / `catch` / `throw`
 
 Runtime errors are values you can catch: division by zero, out-of-bounds

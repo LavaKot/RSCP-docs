@@ -30,7 +30,9 @@ forStep        := assignment' | incDec' | exprStmt' ;
 returnStmt     := "return" [ expression ] [";"] ;
 breakStmt      := "break" [";"] ;
 continueStmt   := "continue" [";"] ;
-tryStmt        := "try" block "catch" [ IDENT ] block ;
+enumDecl       := "enum" IDENT "{" { IDENT [ "(" paramList ")" ] [ "," | ";" ] } "}" ;
+tryStmt        := "try" block { catchClause }+ ;
+catchClause    := "catch" [ IDENT ] [ "code" STRING | "where" expression ] block ;
 importStmt     := "import" STRING [ "as" IDENT ] ;
 throwStmt      := "throw" expression [";"] ;
 block          := "{" ( statement | ";" )* "}" ;
@@ -64,7 +66,8 @@ FSTRING        := 'f"' { litChar | "{{" | "}}" | "{" expression "}" } '"' ;
 matchExpr      := "match" expression "{" arm { ( "," | ";" )* arm } [ "," ] "}" ;
 arm            := pattern { "|" pattern } [ "if" expression ] "=>"
                   ( expression | block ) ;
-pattern        := INT [ ( ".." | "..=" ) INT ] | FLOAT | STRING
+pattern        := IDENT "." IDENT [ "(" [ IDENT { "," IDENT } ] ")" ]
+                | INT [ ( ".." | "..=" ) INT ] | FLOAT | STRING
                 | "true" | "false" | "null" | IDENT | "else" ;  (* "_" is IDENT *)
 closure        := ( "|" paramList "|" | "||" | IDENT "=>"
                    | "(" paramList ")" "=>" ) ( expression | block ) ;
