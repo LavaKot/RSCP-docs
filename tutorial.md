@@ -305,11 +305,39 @@ fn area(s) -> match s {
 # match on enum 'Shape' is not exhaustive: missing variant(s): Point
 ```
 
+Payload elements may be literals, bindings or `_` (26.0.12.0) — perfect
+for command/opcode enums:
+
+```rust
+enum Ast { Num(v), Bin(op, lhs, rhs) }
+fn eval(node) -> match node {
+    Ast.Num(v) => v
+    Ast.Bin("+", l, r) => eval(l) + eval(r)
+    Ast.Bin("-", l, r) => eval(l) - eval(r)
+    Ast.Bin("*", l, r) => eval(l) * eval(r)
+}
+```
+
 Guards work over the destructured payload (`Shape.Rect(w, h) if w == h => …`),
 and a non-enum subject simply takes the `else`/`_` arm. Notes: variants are
 maps under the hood (`keys()` shows the markers), equality is structural
 (same variant, equal payload), and patterns only see enums declared in the
-same file — imports resolve at runtime.
+same file — imports resolve at runtime. `examples/calc.rscp` in the repo is
+a full expression calculator built on these pieces.
+
+### Safe access: get()
+
+`get(m, k, default?)` is the Option-style read (26.0.12.0): the value, or
+the default (`null`) when the key is missing — no `has()` + index dance:
+
+```rust
+var env = {"home": "/home/z"}
+println(get(env, "home"), get(env, "user"), get(env, "user", "<unset>"))
+# /home/z null <unset>
+```
+
+Arrays and strings work too, negative indexes count from the end, and only
+a wrong container type raises (code `ARG`).
 
 ## Errors: `try` / `catch` / `throw`
 

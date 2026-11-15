@@ -32,6 +32,25 @@ program.
 * You need small scripts with classes, modules and error handling without
   installing anything beyond one executable.
 
+## Honest limits (26.0.12)
+
+The Rust-inspired surface does not (yet) carry all of Rust's semantics:
+
+* **No static types** — `enum` gives exhaustiveness and destructuring, not
+  type checking; a match on a non-enum still needs a catch-all.
+* **Same-file enums only** for patterns and exhaustiveness — `import`
+  resolves at runtime, so imported enums are ordinary values.
+* **Local mutual recursion** — a local `fn` can only call siblings that are
+  declared before it; use top-level functions for mutual recursion.
+* **Closures capture by reference** (no `move`), single-threaded VM, no FFI,
+  no bigint (`i64` with checked overflow everywhere).
+* **Modules** export a snapshot of their top-level bindings; there is no
+  `pub`/`private`, and a module function reaching for a module-level var by
+  name at call time reads the importer's globals — declare locals in
+  functions and pass state explicitly.
+* **No package manager** — `import "file.rscp"` by relative path, tests are
+  the golden cases in the repo.
+
 ## When to pick something else
 
 * You need a huge library ecosystem (CPython) or zero-cost abstractions and

@@ -31,6 +31,7 @@ nothing to install.
 | `push(arr, v)` / `pop(arr)` | array stack operations |
 | `keys(map)` | **sorted** array of keys (deterministic iteration) |
 | `has(map, key)` | key-presence test |
+| `get(map, key, default?)` | the value at `key`, or `default` (null) when missing — also arrays/strings, negative indexes from the end (26.0.12.0) |
 | `contains(arr, v)` | member test |
 
 ## Strings
