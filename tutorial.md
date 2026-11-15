@@ -278,16 +278,50 @@ them, and classes compose with everything else in the language.
 
 Runtime errors are values you can catch: division by zero, out-of-bounds
 indexes, missing map keys, failed assertions, `panic()` — and your own
-`throw`. The `catch` binds the error's message text (or stays unnamed):
+`throw`. Every catchable error is a **typed object** with a `code`
+(`"DIV_ZERO"`, `"MISSING_KEY"`, …), a `message` and an optional structured
+`detail`; `print(e)` shows just the message, Python-style (26.0.10.0):
 
 ```rust
 fn parse_int(s) {
     try { return int(s) }
-    catch e { return -1 }        # "int: cannot convert 's' ..."
+    catch e { return -1 }        # e.code == "CONVERT"
 }
 
 try { risky(0) } catch e { println("failed:", e) }
 try { throw "custom boom" } catch { println("caught!") }
+try { let a = [1]; println(a[9]) }
+catch e { println(e.code, e.detail.index, e.detail.length) }   # IDX_RANGE 9 1
+```
+
+### Selective catch
+
+A `try` may list several `catch` clauses; the first whose guard accepts the
+error runs. Guards: `code "X"` (match one error code) or `where expr` (any
+condition over the binding). When every clause declines, the error is
+rethrown unchanged to the next enclosing `try`:
+
+```rust
+try { risky() }
+catch e code "DIV_ZERO" { println("divide by zero") }
+catch e where e.code == "TYPE" { println("bad type:", e.detail) }
+catch e { println("other:", e.code) }
+```
+
+`code` and `where` are contextual keywords — they are only special right
+after `catch [name]`.
+
+### Typed throws
+
+`throw error(code, message, detail?)` builds a typed error; `throw e` of an
+existing error object rethrows it unchanged (codes and custom fields
+survive). A thrown plain map may carry `code`/`message` of its own, and
+everything else becomes code `"USER"`:
+
+```rust
+throw error("PARSE", "bad token", {"pos": 3})
+try { throw {"code": "MY_ERR", "message": "custom"} }
+catch e { println(e.code, e.message) }    # MY_ERR custom
 ```
 
 Errors unwind cleanly through any number of function frames into the
@@ -299,7 +333,8 @@ body completes normally costs one opcode — a handler push and pop.
 Deliberately **not** catchable: stack overflow and internal errors —
 catching those would risk an immediate second failure inside the handler.
 Compile-time errors are of course still compile-time. An uncaught error
-exits with code 70 and a stack trace.
+exits with code 70 and a stack trace. The full error-code table lives in
+[Errors, exit codes and limits](errors.html).
 
 ## Functions and closures
 
