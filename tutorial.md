@@ -265,6 +265,37 @@ println(d.describe())                   # Rex says Woof
 println(d instanceof Animal, type(d))   # true Dog
 ```
 
+### Declared fields (26.0.12.6)
+
+Classes can declare their fields up front — then `self.<name>` is checked
+at **compile time**, and instances come with every declared field present
+(a forgotten assignment reads as `null`, not a `MISSING_KEY` error):
+
+```rust
+class Token {
+    kind, text, pos                    # the declaration
+    fn init(kind, text, pos) {
+        self.kind = kind               # checked: kind/text/pos exist
+        self.text = text
+        self.pos = pos
+    }
+    fn show() -> f"{self.kind}({self.text})"
+}
+println(Token("num", "42", 3).show())  # num(42)
+```
+
+A typo is now a compile error, not a runtime surprise:
+
+```
+syntax error: class 'Token' has no field or method 'txt'; declared fields: kind, text, pos
+```
+
+Reads accept fields and methods; writes only fields. The check resolves
+same-file parent chains (`class Bin(Expr)` inherits `Expr`'s fields); when
+a parent comes from another file the check steps aside instead of risking
+false positives. Classes without a declaration keep the old behavior —
+declaring fields is opt-in.
+
 Methods never list `self` in their parameters — the compiler injects it as
 parameter 0. Overriding `init` replaces the parent's entirely; call the
 parent yourself with `super.init(...)`. Instances print as

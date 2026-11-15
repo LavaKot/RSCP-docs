@@ -13,7 +13,9 @@ statement      := letStmt | fnStmt | classStmt | enumDecl | ifStmt | whileStmt
 letStmt        := ("let" | "var") IDENT "=" expression [";"] ;
 fnStmt         := "fn" IDENT funcBody ;
 classStmt      := "class" IDENT [ "(" IDENT ")" ]
-                  "{" { "fn" IDENT funcBody } "}" ;
+                  "{" { classItem } "}" ;
+classItem      := fieldList | "fn" IDENT funcBody ;
+fieldList      := IDENT { "," IDENT } [ ";" ] ;   (* 26.0.12.6 *)
 funcBody       := "(" [ paramList ] ")" ( block | "->" expression ) ;
 paramList      := IDENT { "," IDENT } [ "," ] ;   (* trailing comma ok *)
 

@@ -37,7 +37,10 @@ program.
 The Rust-inspired surface does not (yet) carry all of Rust's semantics:
 
 * **No static types** — `enum` gives exhaustiveness and destructuring, not
-  type checking; a match on a non-enum still needs a catch-all.
+  type checking; a match on a non-enum still needs a catch-all. The one
+  opt-in exception: classes that declare fields (`class Token { kind, text }`,
+  26.0.12.6) get compile-time `self.<name>` checks and null-initialized
+  fields.
 * **Same-file enums only** for patterns and exhaustiveness — `import`
   resolves at runtime, so imported enums are ordinary values.
 * **Local mutual recursion** — a local `fn` can only call siblings that are
