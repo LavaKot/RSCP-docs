@@ -339,6 +339,26 @@ println(get(env, "home"), get(env, "user"), get(env, "user", "<unset>"))
 Arrays and strings work too, negative indexes count from the end, and only
 a wrong container type raises (code `ARG`).
 
+### Operator traps
+
+Two Rust-shaped behaviors surprise people coming from Python or from
+math habit:
+
+* `^` is **bitwise XOR**, not power. `2 ^ 10` is `8`, not `1024` — power is
+  `**` (`2 ** 10`). C++ has the same trap; here there is no type system to
+  catch it, so the compiler is the only line of defense: double-check every
+  `^` you write.
+* `int / int` is **integer division** like in Rust: `5 / 2` is `2`. For the
+  float result write `5.0 / 2` or `float(a) / b`. There is no implicit
+  promotion.
+
+```rust
+println(2 ^ 10)    # 8   — XOR, not power!
+println(2 ** 10)   # 1024
+println(5 / 2)     # 2   — Rust-style integer division
+println(5.0 / 2)   # 2.5
+```
+
 ## Errors: `try` / `catch` / `throw`
 
 Runtime errors are values you can catch: division by zero, out-of-bounds

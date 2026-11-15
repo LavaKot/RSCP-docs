@@ -5,8 +5,9 @@ The full EBNF of RSCP, followed by the semicolon-insertion rules.
 ```ebnf
 program        := statement* EOF ;
 
-statement      := letStmt | fnStmt | ifStmt | whileStmt | loopStmt | forStmt
-                | tryStmt | throwStmt | importStmt | returnStmt | breakStmt | continueStmt
+statement      := letStmt | fnStmt | classStmt | enumDecl | ifStmt | whileStmt
+                | loopStmt | forStmt | tryStmt | throwStmt | importStmt
+                | returnStmt | breakStmt | continueStmt
                 | block | assignment | incDec | exprStmt | ";" ;
 
 letStmt        := ("let" | "var") IDENT "=" expression [";"] ;
@@ -51,13 +52,14 @@ bitOr          := bitXor { "|" bitXor } ;
 bitXor         := bitAnd { "^" bitAnd } ;
 bitAnd         := equality { "&" equality } ;
 equality       := comparison { ( "==" | "!=" ) comparison } ;
-comparison     := shift { ( "<" | "<=" | ">" | ">=" ) shift } ;
+comparison     := shift { ( "<" | "<=" | ">" | ">=" | "instanceof" ) shift } ;
 shift          := term { ( "<<" | ">>" ) term } ;
 term           := factor { ( "+" | "-" ) factor } ;
 factor         := unary { ( "*" | "/" | "%" ) unary } ;
 unary          := ( "!" | "not" | "-" | "~" ) unary | power ;
 power          := postfix [ "**" unary ] ;   (* right-assoc, tighter than unary *)
-postfix        := primary { "(" [ arguments ] ")" | "[" expression "]" | "." IDENT } ;
+postfix        := primary { "(" [ arguments ] ")" | "[" expression "]" | "." IDENT }
+                | "super" "." IDENT "(" [ arguments ] ")" ;   (* inside methods *)
 arguments      := expression { "," expression } [ "," ] ;
 primary        := INT | FLOAT | STRING | FSTRING | "true" | "false" | "null" | IDENT
                 | "(" expression ")" | arrayLit | mapLit | "fn" funcBody
@@ -66,9 +68,11 @@ FSTRING        := 'f"' { litChar | "{{" | "}}" | "{" expression "}" } '"' ;
 matchExpr      := "match" expression "{" arm { ( "," | ";" )* arm } [ "," ] "}" ;
 arm            := pattern { "|" pattern } [ "if" expression ] "=>"
                   ( expression | block ) ;
-pattern        := IDENT "." IDENT [ "(" [ IDENT { "," IDENT } ] ")" ]
+pattern        := IDENT "." IDENT [ "(" [ variantField { "," variantField } ] ")" ]
                 | INT [ ( ".." | "..=" ) INT ] | FLOAT | STRING
                 | "true" | "false" | "null" | IDENT | "else" ;  (* "_" is IDENT *)
+variantField   := INT | FLOAT | STRING | "true" | "false" | "null"
+                | IDENT ;   (* binding or "_"; literals match the payload *)
 closure        := ( "|" paramList "|" | "||" | IDENT "=>"
                    | "(" paramList ")" "=>" ) ( expression | block ) ;
 arrayLit       := "[" [ expression { "," expression } [ "," ] ] "]" ;
