@@ -265,6 +265,21 @@ println(d.describe())                   # Rex says Woof
 println(d instanceof Animal, type(d))   # true Dog
 ```
 
+### Every match must cover everything (26.0.12.8)
+
+Enum matches must cover every variant — and literal matches must carry a
+catch-all (`else` or a binding). A match that can miss is a **compile
+error**, not a runtime surprise:
+
+```
+syntax error: match is not exhaustive: add an 'else' arm (or a binding
+pattern) so every value is covered
+```
+
+`match x { 1 => "one" }` used to run and raise `NO_ARM` only when a
+non-matching value arrived at runtime; now it does not compile. Guarded
+arms do not count as coverage (the guard may fail), exactly as with enums.
+
 ### Declared fields (26.0.12.6)
 
 Classes can declare their fields up front — then `self.<name>` is checked
